@@ -1,6 +1,8 @@
 name: .NET Build and Test
 
 on:
+  pull_request:
+  merge_group:
   workflow_call:
     inputs:
       dotnet-version:
@@ -28,16 +30,16 @@ jobs:
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: ${{ inputs.dotnet-version }}
+          dotnet-version: ${{ inputs.dotnet-version || '8.0.x' }}
 
       - name: Restore dependencies
         run: dotnet restore
-        working-directory: ${{ inputs.working-directory }}
+        working-directory: ${{ inputs.working-directory || '.' }}
 
       - name: Build
-        run: dotnet build --no-restore --configuration ${{ inputs.build-configuration }}
-        working-directory: ${{ inputs.working-directory }}
+        run: dotnet build --no-restore --configuration ${{ inputs.build-configuration || 'Release' }}
+        working-directory: ${{ inputs.working-directory || '.' }}
 
       - name: Test
-        run: dotnet test --no-build --configuration ${{ inputs.build-configuration }} --verbosity normal --logger trx --collect:"XPlat Code Coverage"
-        working-directory: ${{ inputs.working-directory }}
+        run: dotnet test --no-build --configuration ${{ inputs.build-configuration || 'Release' }} --verbosity normal --logger trx --collect:"XPlat Code Coverage"
+        working-directory: ${{ inputs.working-directory || '.' }}
