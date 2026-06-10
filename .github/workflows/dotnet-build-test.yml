@@ -1,0 +1,45 @@
+name: .NET Build and Test
+
+on:
+  pull_request:
+  merge_group:
+  workflow_call:
+    inputs:
+      dotnet-version:
+        description: The .NET SDK version to use
+        type: string
+        default: '8.0.x'
+      working-directory:
+        description: Working directory containing the solution or project file
+        type: string
+        default: '.'
+      build-configuration:
+        description: Build configuration (Debug or Release)
+        type: string
+        default: 'Release'
+
+jobs:
+  build-and-test:
+    name: Build and Test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ inputs.dotnet-version || '8.0.x' }}
+
+      - name: Restore dependencies
+        run: dotnet restore
+        working-directory: ${{ inputs.working-directory || '.' }}
+
+      - name: Build
+        run: dotnet build --no-restore --configuration ${{ inputs.build-configuration || 'Release' }}
+        working-directory: ${{ inputs.working-directory || '.' }}
+
+      - name: Test
+        run: dotnet test --no-build --configuration ${{ inputs.build-configuration || 'Release' }} --verbosity normal --logger trx --collect:"XPlat Code Coverage"
+        working-directory: ${{ inputs.working-directory || '.' }}
