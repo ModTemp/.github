@@ -39,5 +39,5 @@ jobs:
         working-directory: ${{ inputs.working-directory }}
 
       - name: Test
-        run: dotnet test --no-build --configuration ${{ inputs.build-configuration }} --verbosity normal
+        run: dotnet test --no-build --configuration ${{ inputs.build-configuration }} --verbosity normal --logger trx --collect:"XPlat Code Coverage"
         working-directory: ${{ inputs.working-directory }}
